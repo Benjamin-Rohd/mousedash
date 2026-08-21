@@ -1,0 +1,14 @@
+{
+  "rules": {
+    "dailyHighscore": {
+      ".read": true,
+      ".write": false,
+      ".indexOn": ["score"]
+    },
+    "runs": {
+      ".read": false,
+      ".write": false,
+      ".indexOn": ["startedAt"]
+    }
+  }
+}

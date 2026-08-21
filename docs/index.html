@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MouseDash</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+  <link rel="shortcut icon" href="favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="MouseDash" />
+  <link rel="manifest" href="favicon/site.webmanifest" />
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div id="game-column">
+      <div id="pageHeader">
+        <p id="pageHeaderText">MouseDash.net</p>
+      </div>
+      <div id="game-container"></div>
+      <footer id="pageFooter">
+        <p id="footerCopyright">Copyright &copy; 2026 mousedash.net<br>All rights reserved</p>
+        <!-- <p id="footerFeedback">Feedback? admin@mousedash.net</p> -->
+      </footer>
+    </div>
+    <div id="text-container">
+        <div id="top-text">
+            <p class="basic-text">Click anywhere in the box to start<br>
+            Use the mouse to move<br>
+            Avoid the gray circles</p>
+        </div>
+        <div id="middle-text">
+          <p>Today's hard high score: <span id="currentHighScore">...</span></p>
+          <p id="messageFromHighScorer">Message from the high scorer: </p>
+          <p id="currentMessage">...</p>
+        </div>
+        <div id="bottom-text">
+            <!-- <p class="basic-text">easy | medium | hard</p> -->
+             <!--<p>Difficulty:</p> -->
+            <form>
+                <div id="difficultyGroup">
+                  <input type="radio" id="easy" name="difficulty" value="easy">
+                  <label for="easy">easy</label>
+                  <span></span>
+                  <input type="radio" id="medium" name="difficulty" value="medium" checked>
+                  <label for="medium">medium</label>
+                  <span></span>
+                  <input type="radio" id="hard" name="difficulty" value="hard">
+                  <label for="hard">hard</label>
+                </div>
+                <br>
+                <input type="checkbox" id="mute">
+                <label for="mute">mute</label>
+              </form>
+        </div>
+    </div>
+
+    <div id="highScoreModal" class="modal hidden">
+      <div class="modal-content">
+        <h4 id="newHighScoreHeader">New High Score!</h4>
+        <input
+          id="highScoreMessage"
+          name="highScoreMessage"
+          type="text"
+          maxlength="50"
+          autocomplete="off"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
+          placeholder="Enter a message"
+          autofocus
+        />
+        <div class="modal-buttons">
+          <button id="submitMessage" disabled>Submit</button>
+          <!-- <button id="skipMessage">Skip</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="firebase-init.js"></script>
+  <script type="module" src="game.js"></script>
+
+</body>
+</html>
