@@ -7,6 +7,10 @@
     height: 450,
     parent: 'game-container',
     backgroundColor: "#ffffff",
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     physics: { default: "arcade" },
     scene: { preload, create, update }
   };
