@@ -14,7 +14,8 @@ const RUN_TTL_MS = 26 * 60 * 60 * 1000;
 
 const TIME_ZONE = "America/New_York";
 
-const opts = { maxInstances: 10 };
+//const opts = { maxInstances: 10 };
+const opts = { maxInstances: 10, enforceAppCheck: true };
 
 // For Billing Kill Switch
 const { onMessagePublished } = require("firebase-functions/v2/pubsub");

@@ -3,6 +3,7 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app-check.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDGYoH04YIgh0JW6VLHByhFzGkUKqhBohs",
@@ -18,6 +19,16 @@ const firebaseConfig = {
 const TIME_ZONE = "America/New_York";
 
 const app = initializeApp(firebaseConfig);
+
+if (location.hostname === "127.0.0.1" || location.hostname === "localhost") {
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+}
+
+initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider("6LeiSZUtAAAAAN-fWuhtR29WjlLko7hVjJsd7fDA"), // site key
+  isTokenAutoRefreshEnabled: true,
+});
+
 const analytics = getAnalytics(app);
 const database = getDatabase(app);
 const auth = getAuth(app);
