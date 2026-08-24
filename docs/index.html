@@ -16,6 +16,10 @@
   <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
 </head>
 <body>
+  <div id="touch-notice">
+    <p id="touch-notice-text">MouseDash is designed to be played with a mouse or trackpad.</p>
+    <button id="tryAnyway">Try anyway</button>
+  </div>
   <div id="container">
     <div id="game-column">
       <div id="pageHeader">
@@ -61,7 +65,7 @@
 
     <div id="highScoreModal" class="modal hidden">
       <div class="modal-content">
-        <h4 id="newHighScoreHeader">New High Score!</h4>
+        <h4 id="newHighScoreHeader">New high score!</h4>
         <input
           id="highScoreMessage"
           name="highScoreMessage"

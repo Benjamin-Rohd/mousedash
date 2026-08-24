@@ -23,6 +23,14 @@
   document.querySelector("#mute").addEventListener("change", muteChanged);
 
   const game = new Phaser.Game(config);
+
+  const tryAnywayBtn = document.getElementById("tryAnyway");
+  if (tryAnywayBtn) {
+    tryAnywayBtn.addEventListener("click", () => {
+      document.body.classList.add("force-play");
+      game.scale.refresh();
+    });
+  }
  
   function preload() {
 
@@ -244,6 +252,7 @@ function showHighScorePrompt() {
 
     modal.classList.remove("hidden");
     input.value = "";
+    submitBtn.disabled = true;
     input.focus();
 
     document.getElementById("submitMessage").onclick = () => {
