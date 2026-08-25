@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+//import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
@@ -29,7 +29,7 @@ initializeAppCheck(app, {
   isTokenAutoRefreshEnabled: true,
 });
 
-const analytics = getAnalytics(app);
+//const analytics = getAnalytics(app);
 const database = getDatabase(app);
 const auth = getAuth(app);
 const functions = getFunctions(app);
@@ -91,4 +91,5 @@ export function watchHighscore(callback) {
   });
 }
 
-export { app, analytics, database };
+//export { app, analytics, database };
+export { app, database };

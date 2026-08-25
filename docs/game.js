@@ -1,4 +1,5 @@
-  import { app, analytics, database, beginGame, endGame, watchHighscore } from "./firebase-init.js";
+  //import { app, analytics, database, beginGame, endGame, watchHighscore } from "./firebase-init.js";
+  import { app, database, beginGame, endGame } from "./firebase-init.js";
   import { ref, get, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
   const config = {
