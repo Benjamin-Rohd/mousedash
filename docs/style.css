@@ -138,6 +138,11 @@ input.invalid:focus {
   color: rgb(90, 90, 90);
 }
 
+#email {
+  text-decoration: underline;
+  color: rgb(90, 90, 90);
+}
+
 /* responsiveness */
 @media (max-aspect-ratio: 1/1) {
   body {
