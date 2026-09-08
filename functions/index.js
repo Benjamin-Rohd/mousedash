@@ -128,18 +128,29 @@ exports.submitScore = onCall(opts, async (req) => {
   }
 
   const today = todayString();
-  let beat = false;
 
-  await db.ref("dailyHighscore").transaction((cur) => {
-    if (cur && cur.day === today && cur.score >= finalScore) {
-      beat = false;
-      return;
-    }
-    beat = true;
-    return { day: today, message: cleanMessage, score: finalScore, at: Date.now() };
-  });
+  const topSnap = await db.ref("dailyHighscore")
+    .orderByChild("score")
+    .limitToLast(1)
+    .get();
+
+  let currentBest = 0;
+  topSnap.forEach((child) => { currentBest = child.val().score; });
+
+  const beat = finalScore > currentBest;
+
+  if (beat) {
+    await db.ref("dailyHighscore").push({
+      score: finalScore,
+      message: cleanMessage,
+      uid: uid,
+      date: today,
+      at: Date.now(),
+    });
+  }
 
   return { ok: true, beat, score: finalScore };
+
 });
 
 

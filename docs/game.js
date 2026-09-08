@@ -1,6 +1,6 @@
   //import { app, analytics, database, beginGame, endGame, watchHighscore } from "./firebase-init.js";
   import { app, database, beginGame, endGame } from "./firebase-init.js";
-  import { ref, get, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+  import { ref, get, set, onValue, runTransaction, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
   const config = {
     type: Phaser.AUTO,
@@ -18,7 +18,11 @@
 
   let player, enemies, score = 0, scoreText, active_fl = 0, num_enemies, worldBounds, gameWidth, gameHeight, difficulty, total_velocity, mute, popSound;
   
-  const scoreRef = ref(database, "dailyHighscore");
+  const topScoreQuery = query(
+    ref(database, "dailyHighscore"),
+    orderByChild("dailyHighscore"),
+    limitToLast(1)
+  );
 
   document.querySelector("#difficultyGroup").addEventListener("change", difficultyChanged);
   document.querySelector("#mute").addEventListener("change", muteChanged);
@@ -210,39 +214,32 @@
   // check if score is a new high score
   async function checkScore(new_score) {
     try {
-      const snapshot = await get(scoreRef);
-      if (!snapshot.exists() || Number(new_score.toFixed(1)) > Number(snapshot.val().score ?? 0)) {
+      const snapshot = await get(topScoreQuery);
+      if (!snapshot.exists()) {
         return true;
-      } else {
-        return false;
       }
+      let currentBest = 0;
+      snapshot.forEach((child) => { currentBest = child.val().score; });
+      return Number(new_score.toFixed(1)) > Number(currentBest);
     } catch (err) {
       console.error("Could not check high score:", err);
       return false;
     }
   }
 
-// call updateHighScoreUI() each time a new value arrives in the database
-onValue(scoreRef, (snapshot) => {
-    let data;
-    if (snapshot.exists()) {
-      data = snapshot.val();
-    } else {
-      data = { score: 0, message: "-" };
-    }
+onValue(topScoreQuery, (snapshot) => {
+  let data = null;
+  snapshot.forEach((child) => { data = child.val(); });
 
-    const score = data.score ?? 0;
-    const message = data.message ?? "-";
+  const scoreElem = document.getElementById("currentHighScore");
+  const messageElem = document.getElementById("currentMessage");
 
-    const scoreElem = document.getElementById("currentHighScore");
-    scoreElem.textContent = `${score.toFixed(1)}`;
-
-    const messageElem = document.getElementById("currentMessage");
-    messageElem.textContent = `"${message}"`;
- }, (err) => {
+  scoreElem.textContent = data ? data.score.toFixed(1) : "0.0";
+  messageElem.textContent = data ? `"${data.message}"` : '"-"';
+}, (err) => {
   console.error("High score listener failed:", err);
   document.getElementById("currentHighScore").textContent = "—";
-}); 
+});
 
 // MODAL
 
