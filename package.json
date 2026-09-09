@@ -1,0 +1,10 @@
+{
+  "name": "mousedash-build",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf docs && mkdir -p docs && cp -r src/favicon docs/ && cp src/index.html src/style.css src/pop.mp3 docs/ && esbuild src/game.js src/firebase-init.js --minify --format=esm --outdir=docs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
