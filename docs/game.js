@@ -20,7 +20,7 @@
   
   const topScoreQuery = query(
     ref(database, "dailyHighscore"),
-    orderByChild("dailyHighscore"),
+    orderByChild("score"),
     limitToLast(1)
   );
 
