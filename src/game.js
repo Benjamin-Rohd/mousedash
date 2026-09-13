@@ -1,7 +1,7 @@
-  //import { app, analytics, database, beginGame, endGame, watchHighscore } from "./firebase-init.js";
   import { app, database, beginGame, endGame } from "./firebase-init.js";
   import { ref, get, set, onValue, runTransaction, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
+  // phaser config
   const config = {
     type: Phaser.AUTO,
     width: 550,
@@ -18,17 +18,20 @@
 
   let player, enemies, score = 0, scoreText, active_fl = 0, num_enemies, worldBounds, gameWidth, gameHeight, difficulty, total_velocity, mute, popSound;
   
+  // query current high score
   const topScoreQuery = query(
     ref(database, "dailyHighscore"),
     orderByChild("score"),
     limitToLast(1)
   );
 
+  // event listeners for difficulty and mute buttons
   document.querySelector("#difficultyGroup").addEventListener("change", difficultyChanged);
   document.querySelector("#mute").addEventListener("change", muteChanged);
 
   const game = new Phaser.Game(config);
 
+  // 'try anyway' for mobile
   const tryAnywayBtn = document.getElementById("tryAnyway");
   if (tryAnywayBtn) {
     tryAnywayBtn.addEventListener("click", () => {
@@ -37,12 +40,12 @@
     });
   }
  
+  // load game assets
   function preload() {
-
     this.load.audio('pop', ['pop.mp3']);
-
   }
   
+  // create game
   function create() {
 
     active_fl = 0;
@@ -83,7 +86,7 @@
 
     // click to start
     this.input.on('pointerdown', function (pointer) {
-        if (active_fl == 0) {
+        if (active_fl === 0) {
             player.setActive(true).setVisible(true);
             score = 0;
             active_fl = 1;
@@ -96,7 +99,7 @@
   
   // update - timer
   function update(time, delta) {
-    if (active_fl == 1) {
+    if (active_fl === 1) {
         score += delta / 1000;
     }
     scoreText.setText("Score: " + score.toFixed(1));
@@ -116,7 +119,7 @@
   
   // die
   async function hitEnemy() {
-    if (active_fl == 1) {
+    if (active_fl === 1) {
 
         player.setActive(false).setVisible(false);
         active_fl = 0;
@@ -129,16 +132,13 @@
         // check high score if on hard mode
         if (difficulty === "hard") {
           try {
-            //await submitScore(score);
             const isNewHighScore = await checkScore(score);
 
             if (isNewHighScore) {
               const message = await showHighScorePrompt();
               const clean_message = sanitizeMessage(message).trim();
 
-              // replacing old submit score func
               await endGame(score, clean_message);
-              //await submitScore(score, clean_message);
             }
           } catch (err) {
             console.error("High score flow failed:", err);
@@ -152,33 +152,34 @@
     const rand = Phaser.Math.Between(0, 3);
     let x_pos, y_pos, x_vel, y_vel;
     // left
-    if (rand == 0) {
+    if (rand === 0) {
         x_pos = 0;
         y_pos = Phaser.Math.Between(0, gameHeight);
-        y_vel = Phaser.Math.Between ((-1 * total_velocity / 2), (total_velocity / 2))
+        y_vel = Phaser.Math.Between((-1 * total_velocity / 2), (total_velocity / 2));
         x_vel = total_velocity - Math.abs(y_vel);
     // top
-    } else if (rand == 1) {
+    } else if (rand === 1) {
         x_pos = Phaser.Math.Between(0, gameWidth);
         y_pos = 0;
-        x_vel = Phaser.Math.Between ((-1 * total_velocity / 2), (total_velocity / 2))
+        x_vel = Phaser.Math.Between((-1 * total_velocity / 2), (total_velocity / 2));
         y_vel = total_velocity - Math.abs(x_vel);
     // right
-    } else if (rand == 2) {
+    } else if (rand === 2) {
         x_pos = gameWidth;
         y_pos = Phaser.Math.Between(0, gameHeight);
-        y_vel = Phaser.Math.Between ((-1 * total_velocity / 2), (total_velocity / 2))
+        y_vel = Phaser.Math.Between((-1 * total_velocity / 2), (total_velocity / 2));
         x_vel = -1 * (total_velocity - Math.abs(y_vel));
     // bottom
     } else {
         x_pos = Phaser.Math.Between(0, gameWidth);
         y_pos = gameHeight;
-        x_vel = Phaser.Math.Between ((-1 * total_velocity / 2), (total_velocity / 2))
+        x_vel = Phaser.Math.Between((-1 * total_velocity / 2), (total_velocity / 2));
         y_vel = -1 * (total_velocity - Math.abs(x_vel));
     }
     return {x_pos, y_pos, x_vel, y_vel};
   }
 
+  // update enemy velocity based on difficulty
   function updateTotalVelocity() {
     if (difficulty === "easy") {
       total_velocity = 150;
@@ -189,15 +190,11 @@
     }
   }
 
+  // update enemy velocity and reset score if difficulty is changed
   function difficultyChanged(event) {
     difficulty = event.target.value;
-    if (difficulty === "easy") {
-      total_velocity = 150;
-    } else if (difficulty === "hard") {
-      total_velocity = 250;
-    } else {
-      total_velocity = 200;
-    }
+
+    updateTotalVelocity();
 
     resetScore();
   }
@@ -206,7 +203,7 @@
     mute = document.querySelector("#mute").checked;
   }
 
-  // reset score function for change of radio buttons - need to make it globally accessible
+  // reset score
   function resetScore() {
     score = 0;
   }
@@ -227,6 +224,7 @@
     }
   }
 
+// update high score display
 onValue(topScoreQuery, (snapshot) => {
   let data = null;
   snapshot.forEach((child) => { data = child.val(); });
@@ -238,11 +236,11 @@ onValue(topScoreQuery, (snapshot) => {
   messageElem.textContent = data ? `"${data.message}"` : '"-"';
 }, (err) => {
   console.error("High score listener failed:", err);
-  document.getElementById("currentHighScore").textContent = "—";
+  document.getElementById("currentHighScore").textContent = "...";
+  document.getElementById("currentMessage").textContent = "...";
 });
 
-// MODAL
-
+// show prompt modal for high score message
 function showHighScorePrompt() {
   return new Promise((resolve) => {
     const modal = document.getElementById("highScoreModal");
@@ -257,18 +255,13 @@ function showHighScorePrompt() {
       modal.classList.add("hidden");
       resolve(input.value.trim());
     };
-
-    // document.getElementById("skipMessage").onclick = () => {
-    //   modal.classList.add("hidden");
-    //   resolve("");
-    // };
   });
 }
 
 const input_field = document.getElementById("highScoreMessage");
 const submitBtn = document.getElementById("submitMessage");
 
-
+// take high score message input
 input_field.addEventListener("input", () => {
   const raw = input_field.value;
   
@@ -289,16 +282,14 @@ input_field.addEventListener("input", () => {
   if (cleaned !== raw) {
     input_field.classList.add("invalid");
     submitBtn.disabled = true;
-    //warning.textContent = "Only letters, numbers, and basic punctuation allowed.";
   } else {
     input_field.classList.remove("invalid");
     submitBtn.disabled = false;
-    //warning.textContent = "";
   }
 });
 
 
-// PROFANITY FILTER - keep this updated in both places
+// PROFANITY FILTER
 const BANNED_WORDS = [
   "fuck",
   "shit",
@@ -314,6 +305,7 @@ const BANNED_WORDS = [
   "retard",
 ];
 
+  // sanitize high score message input
   function sanitizeMessage(message) {
 
     let message1 = message

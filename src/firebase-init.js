@@ -1,10 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-//import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-functions.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app-check.js";
 
+// firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDGYoH04YIgh0JW6VLHByhFzGkUKqhBohs",
   authDomain: "mouser-e3cf5.firebaseapp.com",
@@ -20,16 +20,17 @@ const TIME_ZONE = "America/New_York";
 
 const app = initializeApp(firebaseConfig);
 
+// show appcheck debug token when running locally
 if (location.hostname === "127.0.0.1" || location.hostname === "localhost") {
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
 
+// initialize appcheck
 initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider("6LeiSZUtAAAAAN-fWuhtR29WjlLko7hVjJsd7fDA"), // site key
   isTokenAutoRefreshEnabled: true,
 });
 
-//const analytics = getAnalytics(app);
 const database = getDatabase(app);
 const auth = getAuth(app);
 const functions = getFunctions(app);
@@ -43,10 +44,12 @@ const ready = signInAnonymously(auth).catch((err) => {
 
 let currentRunId = null;
 
+// get date string
 function todayString() {
   return new Date().toLocaleDateString("en-CA", { timeZone: TIME_ZONE });
 }
 
+// issue run ID on game start in hard mode
 export async function beginGame() {
   currentRunId = null;
   try {
@@ -59,6 +62,7 @@ export async function beginGame() {
   }
 }
 
+// check and submit new high score
 export async function endGame(score, message) {
   if (!currentRunId) {
     console.warn("No run in progress; score not submitted.");
@@ -80,16 +84,4 @@ export async function endGame(score, message) {
   }
 }
 
-export function watchHighscore(callback) {
-  onValue(ref(database, "dailyHighscore"), (snap) => {
-    const rec = snap.val();
-    if (!rec || rec.day !== todayString()) {
-      callback(null);
-    } else {
-      callback(rec);
-    }
-  });
-}
-
-//export { app, analytics, database };
 export { app, database };

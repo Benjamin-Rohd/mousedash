@@ -14,7 +14,6 @@ const RUN_TTL_MS = 26 * 60 * 60 * 1000;
 
 const TIME_ZONE = "America/New_York";
 
-//const opts = { maxInstances: 10 };
 const opts = { maxInstances: 10, enforceAppCheck: true };
 
 // For Billing Kill Switch
@@ -43,6 +42,7 @@ const BANNED_WORDS = [
   "retard",
 ];
 
+  // server side high score message sanitization 
   function sanitizeMessage(message) {
 
     let message1 = message
@@ -54,7 +54,6 @@ const BANNED_WORDS = [
       .replace(/\s+/g, " ")
       .replace(/\b((https?:\/\/)|(www\.)|\w+\.\w{2,})[^\s]*\b/gi, "");
 
-    //const message2 = filter.clean(message1);
       BANNED_WORDS.forEach(word => {
         const wordRegex = new RegExp(`${word}`, "gi");
         message1 = message1.replace(wordRegex, "***")
@@ -63,6 +62,7 @@ const BANNED_WORDS = [
     return message1.slice(0, 50).trim();
   }
 
+// issue run ID on game start in hard mode
 exports.startRun = onCall(opts, async (req) => {
   const uid = req.auth?.uid;
   if (!uid) throw new HttpsError("unauthenticated", "Sign in first.");
@@ -73,6 +73,7 @@ exports.startRun = onCall(opts, async (req) => {
   return { runId: ref.key };
 });
 
+// validate and push new high score
 exports.submitScore = onCall(opts, async (req) => {
   const uid = req.auth?.uid;
   if (!uid) throw new HttpsError("unauthenticated", "Sign in first.");
@@ -88,10 +89,6 @@ exports.submitScore = onCall(opts, async (req) => {
 
   const finalScore = Math.round(score * 10) / 10;
 
-  // const cleanMessage = String(message ?? "")
-  //   .replace(/[\u0000-\u001F\u007F]/g, "")
-  //   .slice(0, 100)
-  //   .trim();
   const cleanMessage = sanitizeMessage(String(message ?? ""));
 
   const runRef = db.ref(`runs/${runId}`);
@@ -153,8 +150,7 @@ exports.submitScore = onCall(opts, async (req) => {
 
 });
 
-
-
+// remove old entries from runs database daily
 exports.cleanupRuns = onSchedule(
   { schedule: "30 4 * * *", timeZone: TIME_ZONE, maxInstances: 1 },
   async () => {
@@ -176,6 +172,7 @@ exports.cleanupRuns = onSchedule(
   }
 );
 
+// clear high score at midnight daily
 exports.dailyReset = onSchedule(
   { schedule: "0 0 * * *", timeZone: TIME_ZONE, maxInstances: 1 },
   async () => {
