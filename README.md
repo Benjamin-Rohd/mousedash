@@ -36,6 +36,6 @@ The approach is to make the server the authority on everything it can measure:
 
 ## Known limitations
 
-A player can still modify the client to make the game easier and then legitimately survive longer. Closing that would require deterministic replay validation (seeded RNG, fixed timestep, and re-simulating the input log server-side), which was out of scope for a project this size. The current design bounds what a cheater can claim and makes removal cheap, rather than making cheating impossible.
+A player can still cheat by modifying the client to make the game easier and then beating the high score. Closing that would require deterministic replay validation (seeded RNG, fixed timestep, and re-simulating the input log server-side), which is out of scope for a project of this size. The current design bounds what a cheater can claim and makes removal cheap, rather than making cheating impossible.
 
-Anonymous auth means bans are easily evaded. Moderation of the leaderboard message is a banned word list, which is inherently incomplete.
+Anonymous auth means bans are easily evaded. Moderation of the high score message is a banned word list, which is inherently incomplete.
