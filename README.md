@@ -2,7 +2,7 @@
 
 A browser reflex game with a global daily leaderboard. Dodge the circles, survive as long as you can, and leave a message if you take the top spot. 
 
-120,000+ games played in the first two weeks.
+125,000+ games played in the first two weeks.
 
 **Play it: [mousedash.net](https://mousedash.net)**
 
