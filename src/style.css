@@ -136,6 +136,15 @@ input.invalid:focus {
   color: rgb(90, 90, 90);
 }
 
+#pageFooter a {
+  color: rgb(90, 90, 90);
+  text-decoration: none;
+}
+
+#footerFeedback {
+  text-align: right;
+}
+
 #email {
   text-decoration: underline;
   color: rgb(90, 90, 90);
@@ -181,4 +190,31 @@ input.invalid:focus {
 
 #tryAnyway {
   margin-top: 8px;
+}
+
+/* privacy */
+#legal-page {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  font-family: 'Times New Roman', Times, Georgia, serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+#legal-page h1 {
+  font-size: 28px;
+}
+
+#legal-page h2 {
+  font-size: 18px;
+  margin-top: 28px;
+}
+
+#legal-page p {
+  margin: 0 0 14px 0;
+}
+
+#legal-page ul {
+  margin: 0 0 14px 0;
 }
