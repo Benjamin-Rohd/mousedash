@@ -2,9 +2,9 @@
   "name": "mousedash-build",
   "private": true,
   "scripts": {
-    "build": "rm -rf docs && mkdir -p docs && cp -r src/favicon docs/ && cp src/index.html src/privacy.html src/terms.html src/style.css src/pop.mp3 docs/ && esbuild src/game.js src/firebase-init.js --minify --format=esm --outdir=docs"
+    "build": "rm -rf docs && mkdir -p docs && cp -r src/favicon docs/ && cp src/index.html src/privacy.html src/terms.html src/style.css src/pop.mp3 docs/ && javascript-obfuscator src/game.js --output docs/game.js --compact true --string-array true --string-array-threshold 0.75 --identifier-names-generator hexadecimal --rename-globals true && javascript-obfuscator src/firebase-init.js --output docs/firebase-init.js --compact true --string-array true --string-array-threshold 0.75 --identifier-names-generator hexadecimal --rename-globals true"
   },
   "devDependencies": {
-    "esbuild": "^0.24.0"
+    "javascript-obfuscator": "5.10.0"
   }
 }

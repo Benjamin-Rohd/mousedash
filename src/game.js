@@ -17,7 +17,7 @@
   };
 
   let player, enemies, score = 0, scoreText, active_fl = 0, num_enemies, worldBounds, gameWidth, gameHeight, difficulty, total_velocity, mute, popSound;
-  
+
   // query current high score
   const topScoreQuery = query(
     ref(database, "dailyHighscore"),

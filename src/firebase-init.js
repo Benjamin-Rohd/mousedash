@@ -65,7 +65,7 @@ export async function beginGame() {
 // check and submit new high score
 export async function endGame(score, message) {
   if (!currentRunId) {
-    console.warn("No run in progress; score not submitted.");
+    console.warn("Score not submitted."); // No run in progress
     return { ok: false };
   }
   const runId = currentRunId;

@@ -65,7 +65,10 @@ const BANNED_WORDS = [
 // issue run ID on game start in hard mode
 exports.startRun = onCall(opts, async (req) => {
   const uid = req.auth?.uid;
-  if (!uid) throw new HttpsError("unauthenticated", "Sign in first.");
+  if (!uid) {
+    console.log("Rejected:", uid, "unauthenticated - Sign in first.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
+  }
 
   const ref = db.ref("runs").push();
   await ref.set({ uid, startedAt: Date.now(), used: false });
@@ -76,15 +79,20 @@ exports.startRun = onCall(opts, async (req) => {
 // validate and push new high score
 exports.submitScore = onCall(opts, async (req) => {
   const uid = req.auth?.uid;
-  if (!uid) throw new HttpsError("unauthenticated", "Sign in first.");
+  if (!uid) {
+    console.log("Rejected:", uid, "unauthenticated - Sign in first.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
+  }
 
   const { runId, score, message } = req.data ?? {};
 
   if (typeof runId !== "string" || !/^[A-Za-z0-9_-]{1,32}$/.test(runId)) {
-    throw new HttpsError("invalid-argument", "Bad run id.");
+    console.log("Rejected:", uid, "invalid-argument - Bad run id.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
   }
   if (typeof score !== "number" || !Number.isFinite(score) || score < 0) {
-    throw new HttpsError("invalid-argument", "Bad score.");
+    console.log("Rejected:", uid, "invalid-argument - Bad score.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
   }
 
   const finalScore = Math.round(score * 10) / 10;
@@ -95,24 +103,29 @@ exports.submitScore = onCall(opts, async (req) => {
   const runSnap = await runRef.get();
 
   if (!runSnap.exists()) {
-    throw new HttpsError("not-found", "Unknown run.");
+    console.log("Rejected:", uid, "not-found - Unknown run.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
   }
 
   const run = runSnap.val();
 
   if (run.uid !== uid) {
-    throw new HttpsError("permission-denied", "Not your run.");
+    console.log("Rejected:", uid, "permission-denied - Not your run.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
   }
 
   const elapsed = Date.now() - run.startedAt;
   if (elapsed < MIN_RUN_MS) {
-    throw new HttpsError("failed-precondition", "Run too short.");
+    console.log("Rejected:", uid, "failed-precondition - Run too short.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
   }
   if (elapsed > MAX_RUN_MS) {
-    throw new HttpsError("failed-precondition", "Run expired.");
+    console.log("Rejected:", uid, "failed-precondition - Run expired.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
   }
   if (finalScore > elapsed / 1000 + GRACE_SECONDS) {
-    throw new HttpsError("failed-precondition", "Score exceeds elapsed time.");
+    console.log("Rejected:", uid, "failed-precondition - Score exceeds elapsed time.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
   }
 
   const claim = await runRef.child("used").transaction((used) => {
@@ -121,7 +134,8 @@ exports.submitScore = onCall(opts, async (req) => {
   });
 
   if (!claim.committed) {
-    throw new HttpsError("failed-precondition", "Run already submitted.");
+    console.log("Rejected:", uid, "failed-precondition - Run already submitted.");
+    throw new HttpsError("failed-precondition", "Score rejected.");
   }
 
   const today = todayString();
